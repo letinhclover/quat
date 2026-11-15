@@ -1,0 +1,1403 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Sổ Quạt" />
+  <title>Sổ Quạt</title>
+  <style>
+    :root {
+      --bg: #f3f4f6;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --primary: #0068ff;
+      --primary-soft: #eff6ff;
+      --green: #16a34a;
+      --green-soft: #dcfce7;
+      --amber: #d97706;
+      --amber-soft: #fef3c7;
+      --red: #dc2626;
+      --red-soft: #fee2e2;
+      --radius: 14px;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding-bottom: calc(76px + env(safe-area-inset-bottom));
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      padding: calc(10px + env(safe-area-inset-top)) 14px 10px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .container { max-width: 640px; margin: 0 auto; padding: 12px; }
+    .tab-page { display: none; }
+    .tab-page.active { display: block; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+    .row { display: flex; gap: 8px; align-items: center; }
+    .between { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+
+    .sum-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sum-label { font-size: 12px; color: var(--muted); }
+    .sum-val { font-size: 19px; font-weight: 700; margin-top: 2px; }
+    .sum-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    .wait-bar {
+      margin-top: 10px;
+      padding: 9px 11px;
+      border-radius: 10px;
+      background: var(--amber-soft);
+      color: #92400e;
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+    }
+    .ready-line {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+
+    .text-green { color: var(--green); }
+    .text-amber { color: var(--amber); }
+    .text-primary { color: var(--primary); }
+    .text-muted { color: var(--muted); }
+
+    input, select {
+      width: 100%;
+      font-size: 16px;
+      padding: 9px 11px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      background: #fff;
+      color: var(--text);
+      font-family: inherit;
+    }
+    input:focus, select:focus { outline: none; border-color: var(--primary); }
+    label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; color: #374151; }
+    .field { margin-bottom: 11px; }
+
+    .btn {
+      border: none;
+      border-radius: 10px;
+      padding: 11px 14px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      font-family: inherit;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-green { background: var(--green); color: #fff; }
+    .btn-danger { background: var(--red-soft); color: var(--red); }
+    .btn-soft { background: var(--bg); color: var(--text); }
+    .btn-sm { padding: 6px 10px; font-size: 13px; border-radius: 8px; }
+    .btn-block { width: 100%; }
+
+    .chip-group { display: flex; gap: 6px; flex-wrap: wrap; }
+    .chip {
+      padding: 7px 12px;
+      border-radius: 99px;
+      border: 1px solid var(--border);
+      background: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+    }
+    .chip.active { background: var(--primary-soft); border-color: var(--primary); color: var(--primary); }
+    .chip.active-green { background: var(--green-soft); border-color: var(--green); color: var(--green); }
+    .chip.active-amber { background: var(--amber-soft); border-color: var(--amber); color: var(--amber); }
+
+    .order-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px;
+      margin-bottom: 8px;
+    }
+    .badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: var(--bg);
+      color: #374151;
+    }
+    .badge-done { background: var(--green-soft); color: var(--green); }
+    .badge-wait { background: var(--amber-soft); color: var(--amber); }
+
+    .list-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .list-row:last-child { border-bottom: none; padding-bottom: 2px; }
+    .qty-ctrl { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .qty-num { min-width: 28px; text-align: center; font-weight: 700; font-size: 15px; }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      z-index: 30;
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid var(--border);
+      display: flex;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    .nav-btn {
+      flex: 1;
+      border: none;
+      background: none;
+      padding: 9px 4px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      cursor: pointer;
+    }
+    .nav-btn.active { color: var(--primary); }
+    .nav-icon { font-size: 19px; line-height: 1; }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 50;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-sheet {
+      background: #fff;
+      width: 100%;
+      max-width: 600px;
+      max-height: 92vh;
+      overflow-y: auto;
+      border-radius: 18px 18px 0 0;
+      padding: 16px 16px calc(24px + env(safe-area-inset-bottom));
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .modal-title { font-size: 17px; font-weight: 700; }
+    .close-btn {
+      background: var(--bg);
+      border: none;
+      width: 30px; height: 30px;
+      border-radius: 99px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .check-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg);
+      padding: 10px;
+      border-radius: 10px;
+      margin-bottom: 11px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .check-row input[type="checkbox"] { width: 19px; height: 19px; flex-shrink: 0; }
+
+    .calc-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 0;
+      border-bottom: 1px solid var(--border);
+      gap: 8px;
+      font-size: 14px;
+    }
+    .calc-row:last-child { border-bottom: none; }
+    .calc-row input[type="checkbox"] { width: 19px; height: 19px; flex-shrink: 0; }
+    .calc-qty { width: 58px !important; padding: 5px 6px !important; text-align: center; }
+
+    .suggest-box { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+    .suggest-chip {
+      font-size: 12px;
+      padding: 5px 10px;
+      border-radius: 8px;
+      background: var(--primary-soft);
+      color: var(--primary);
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .empty { text-align: center; padding: 30px 12px; color: var(--muted); font-size: 14px; }
+
+    .toast {
+      position: fixed;
+      top: calc(52px + env(safe-area-inset-top));
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1f2937;
+      color: #fff;
+      padding: 8px 15px;
+      border-radius: 99px;
+      font-size: 13px;
+      font-weight: 600;
+      z-index: 100;
+      display: none;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+
+<header>Sổ Quạt</header>
+<div id="toast" class="toast"></div>
+
+<div class="container">
+  <!-- TAB 1: BÁN HÀNG -->
+  <section id="tab-sales" class="tab-page active">
+    <div class="card">
+      <div class="sum-grid">
+        <div>
+          <div class="sum-label">Doanh thu</div>
+          <div class="sum-val text-primary" id="stRevenue">0đ</div>
+          <div class="sum-sub" id="stOrdersCount">0 đơn</div>
+        </div>
+        <div>
+          <div class="sum-label">Lợi nhuận tạm tính</div>
+          <div class="sum-val text-green" id="stProfit">0đ</div>
+          <div class="sum-sub" id="stProdCounts">Vàng 0 • 3 lá 0 • 6 lá 0</div>
+        </div>
+      </div>
+
+      <div class="wait-bar" onclick="quickFilterWait()">
+        <span>⏳ Chờ mùng 10 (<span id="stPendingCount">0 đơn</span>)</span>
+        <strong id="stPendingMoney">0đ</strong>
+      </div>
+
+      <div class="ready-line" onclick="switchTab('parts')">
+        <span>Quạt sẵn:</span>
+        <strong id="salesReadyBanner" style="color:var(--text);">Vàng 0 • 3 lá 0 • 6 lá 0</strong>
+      </div>
+    </div>
+
+    <button class="btn btn-primary btn-block" style="margin-bottom: 10px;" onclick="openOrderModal()">
+      + Thêm đơn
+    </button>
+
+    <div class="card" style="padding: 10px;">
+      <input type="text" id="filterSearch" placeholder="Tìm tên khách, ghi chú..." oninput="renderSales()" style="margin-bottom: 8px;" />
+      <div class="row">
+        <select id="filterMonth" onchange="renderSales()"></select>
+        <select id="filterWarehouse" onchange="renderSales()">
+          <option value="ALL">Mọi kho</option>
+          <option value="GW0">GW0</option>
+          <option value="GW5">GW5</option>
+          <option value="GW6">GW6</option>
+          <option value="Khách ngoài">Khách ngoài</option>
+        </select>
+        <select id="filterStatus" onchange="renderSales()">
+          <option value="ALL">Mọi TT</option>
+          <option value="Chờ mùng 10">Mùng 10</option>
+          <option value="Đã xong">Đã xong</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="salesList"></div>
+  </section>
+
+  <!-- TAB 2: KHO -->
+  <section id="tab-parts" class="tab-page">
+    <div class="card">
+      <div class="sum-label">Tổng vốn tồn đọng</div>
+      <div class="sum-val text-primary" id="totalStockCapital">0đ</div>
+      <div class="sum-sub" id="stockCapitalBreakdown">Quạt sẵn: 0đ • Linh kiện: 0đ</div>
+    </div>
+
+    <div class="card">
+      <div class="between" style="margin-bottom: 6px;">
+        <strong style="font-size:15px;">Quạt sẵn bán</strong>
+        <button class="btn btn-sm btn-primary" onclick="openAssembleModal()">🔧 Ráp quạt</button>
+      </div>
+      <div id="readyStockRows"></div>
+    </div>
+
+    <div class="card">
+      <div class="between" style="margin-bottom: 8px;">
+        <div>
+          <strong style="font-size:15px;">Linh kiện</strong>
+          <div style="font-size:12px; color:var(--muted);" id="ptSummary">Vốn tồn: 0đ</div>
+        </div>
+        <div class="row" style="gap:6px;">
+          <button class="btn btn-sm btn-soft" onclick="toggleCalcBox()">🧮 Nhẩm vốn</button>
+          <button class="btn btn-sm btn-primary" onclick="openPartModal()">+ Thêm</button>
+        </div>
+      </div>
+
+      <div id="calcBox" style="display:none; background:var(--bg); border-radius:10px; padding:10px; margin-bottom:10px;">
+        <div class="between" style="margin-bottom:8px;">
+          <strong style="font-size:14px;">Nhẩm vốn 1 cây quạt</strong>
+          <button class="btn btn-sm btn-soft" style="background:#fff;" onclick="toggleCalcBox()">Đóng</button>
+        </div>
+        <div class="chip-group" style="margin-bottom:8px;">
+          <button type="button" class="chip" onclick="applyCalcPreset('Quạt 3 lá')">Quạt 3 lá</button>
+          <button type="button" class="chip" onclick="applyCalcPreset('Quạt 6 lá')">Quạt 6 lá</button>
+          <button type="button" class="chip" onclick="applyCalcPreset('Quạt vàng')">Quạt vàng</button>
+          <button type="button" class="chip" onclick="applyCalcPreset('none')">Bỏ chọn</button>
+        </div>
+        <div id="calcList"></div>
+        <div class="between" style="margin-top:8px; font-size:15px;">
+          <span>Tổng vốn:</span>
+          <strong class="text-green" id="calcTotal">0đ</strong>
+        </div>
+      </div>
+
+      <input type="text" id="partSearch" placeholder="Tìm linh kiện..." oninput="renderParts()" style="margin-bottom: 6px;" />
+      <div id="partsList"></div>
+    </div>
+  </section>
+
+  <!-- TAB 3: CÀI ĐẶT -->
+  <section id="tab-settings" class="tab-page">
+    <div class="card">
+      <strong style="font-size:15px; display:block; margin-bottom:8px;">Sao lưu &amp; Khôi phục</strong>
+      <div class="row" style="margin-bottom: 8px;">
+        <button class="btn btn-primary" style="flex:1;" onclick="exportBackup()">⬇️ Sao lưu</button>
+        <label class="btn btn-soft" style="flex:1; margin:0; text-align:center;">
+          ⬆️ Khôi phục
+          <input type="file" accept=".json,application/json" style="display:none;" onchange="importBackup(event)" />
+        </label>
+      </div>
+      <div id="lastBackupText" style="font-size:12px; color:var(--muted);"></div>
+    </div>
+
+    <div class="card">
+      <strong style="font-size:15px; display:block; margin-bottom:10px;">Giá mặc định (Bán / Vốn)</strong>
+      <div class="field">
+        <label>Quạt vàng</label>
+        <div class="row">
+          <input type="number" inputmode="numeric" id="defPriceVang" />
+          <input type="number" inputmode="numeric" id="defCostVang" />
+        </div>
+      </div>
+      <div class="field">
+        <label>Quạt 3 lá</label>
+        <div class="row">
+          <input type="number" inputmode="numeric" id="defPrice3La" />
+          <input type="number" inputmode="numeric" id="defCost3La" />
+        </div>
+      </div>
+      <div class="field">
+        <label>Quạt 6 lá</label>
+        <div class="row">
+          <input type="number" inputmode="numeric" id="defPrice6La" />
+          <input type="number" inputmode="numeric" id="defCost6La" />
+        </div>
+      </div>
+      <button class="btn btn-green btn-block" onclick="savePriceSettings()">Lưu giá mặc định</button>
+    </div>
+
+    <div class="card">
+      <button class="btn btn-soft btn-block" onclick="resetDefaultParts()">
+        🔄 Nạp lại linh kiện mẫu ban đầu
+      </button>
+    </div>
+  </section>
+</div>
+
+<!-- Bottom Navigation -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" id="nav-sales" onclick="switchTab('sales')">
+    <span class="nav-icon">🧾</span><span>Bán hàng</span>
+  </button>
+  <button class="nav-btn" id="nav-parts" onclick="switchTab('parts')">
+    <span class="nav-icon">📦</span><span>Kho</span>
+  </button>
+  <button class="nav-btn" id="nav-settings" onclick="switchTab('settings')">
+    <span class="nav-icon">⚙️</span><span>Cài đặt</span>
+  </button>
+</nav>
+
+<!-- MODAL ĐƠN HÀNG -->
+<div id="orderModal" class="modal-backdrop">
+  <div class="modal-sheet">
+    <div class="modal-header">
+      <div class="modal-title" id="orderModalTitle">Thêm đơn</div>
+      <button class="close-btn" onclick="closeModal('orderModal')">✕</button>
+    </div>
+    <input type="hidden" id="ordId" />
+
+    <div class="row">
+      <div class="field" style="flex:1;">
+        <label>Ngày bán</label>
+        <input type="date" id="ordDate" />
+      </div>
+      <div class="field" style="flex:1;">
+        <label>SĐT (tùy chọn)</label>
+        <input type="tel" inputmode="tel" id="ordPhone" placeholder="09..." />
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Tên khách *</label>
+      <input type="text" id="ordName" placeholder="Nhập tên..." oninput="renderCustomerSuggestions()" />
+      <div id="customerSuggest" class="suggest-box"></div>
+    </div>
+
+    <div class="field">
+      <label>Kho</label>
+      <div class="chip-group" id="ordWhChips">
+        <button type="button" class="chip active" onclick="selectWh('GW0', this)">GW0</button>
+        <button type="button" class="chip" onclick="selectWh('GW5', this)">GW5</button>
+        <button type="button" class="chip" onclick="selectWh('GW6', this)">GW6</button>
+        <button type="button" class="chip" onclick="selectWh('Khách ngoài', this)">Khách ngoài</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Loại quạt</label>
+      <div class="chip-group" id="ordProdChips">
+        <button type="button" class="chip active" onclick="selectProduct('Quạt vàng', this)">Quạt vàng</button>
+        <button type="button" class="chip" onclick="selectProduct('Quạt 3 lá', this)">Quạt 3 lá</button>
+        <button type="button" class="chip" onclick="selectProduct('Quạt 6 lá', this)">Quạt 6 lá</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field" style="width: 72px;">
+        <label>SL</label>
+        <input type="number" inputmode="numeric" id="ordQty" value="1" min="1" oninput="updateOrderPreview()" />
+      </div>
+      <div class="field" style="flex:1;">
+        <label>Giá bán</label>
+        <input type="number" inputmode="numeric" id="ordPrice" oninput="updateOrderPreview()" />
+      </div>
+      <div class="field" style="flex:1;">
+        <label>Giá vốn</label>
+        <input type="number" inputmode="numeric" id="ordCost" oninput="updateOrderPreview()" />
+      </div>
+    </div>
+
+    <div class="between" style="font-size:13px; margin:-4px 0 10px; color:var(--muted);">
+      <span>Thành tiền: <strong id="ordPreviewTotal" class="text-primary">0đ</strong></span>
+      <span>Lãi: <strong id="ordPreviewProfit" class="text-green">0đ</strong></span>
+    </div>
+
+    <label class="check-row">
+      <input type="checkbox" id="ordDeductStock" checked />
+      <div>
+        <div style="font-weight:600;">Trừ kho quạt sẵn</div>
+        <div style="font-size:12px; color:var(--muted);">Bỏ tích nếu nhập đơn cũ từ trước</div>
+      </div>
+    </label>
+
+    <div class="field">
+      <label>Thanh toán</label>
+      <div class="chip-group" id="ordStatusChips">
+        <button type="button" class="chip active-amber" onclick="selectStatus('Chờ mùng 10', this)">Chờ mùng 10</button>
+        <button type="button" class="chip" onclick="selectStatus('Đã xong', this)">Đã xong</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Ghi chú</label>
+      <input type="text" id="ordNote" placeholder="VD: mua giúp..." />
+    </div>
+
+    <div class="row">
+      <button class="btn btn-danger" id="ordDeleteBtn" style="display:none;" onclick="deleteCurrentOrder()">Xóa</button>
+      <button class="btn btn-primary" style="flex:1;" onclick="saveOrder()">Lưu đơn</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL RÁP QUẠT -->
+<div id="assembleModal" class="modal-backdrop">
+  <div class="modal-sheet">
+    <div class="modal-header">
+      <div class="modal-title">Ráp quạt</div>
+      <button class="close-btn" onclick="closeModal('assembleModal')">✕</button>
+    </div>
+
+    <div class="field">
+      <label>Loại quạt</label>
+      <div class="chip-group" id="asmProdChips">
+        <button type="button" class="chip active" onclick="selectAsmProduct('Quạt 3 lá', this)">Quạt 3 lá</button>
+        <button type="button" class="chip" onclick="selectAsmProduct('Quạt 6 lá', this)">Quạt 6 lá</button>
+        <button type="button" class="chip" onclick="selectAsmProduct('Quạt vàng', this)">Quạt vàng</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Số lượng ráp (cây)</label>
+      <input type="number" inputmode="numeric" id="asmQty" value="1" min="1" oninput="updateAsmSummary()" />
+    </div>
+
+    <label class="check-row">
+      <input type="checkbox" id="asmDeductParts" checked onchange="toggleAsmPartsList()" />
+      <span style="font-weight:600;">Tự trừ linh kiện tồn kho</span>
+    </label>
+
+    <div id="asmPartsWrapper" class="field">
+      <div id="asmPartsList" style="max-height: 210px; overflow-y: auto; border:1px solid var(--border); border-radius:10px; padding:2px 10px;"></div>
+    </div>
+
+    <div class="between" style="font-size:13px; margin-bottom:12px;">
+      <span>Vốn 1 cây: <strong id="asmUnitCost">0đ</strong></span>
+      <strong id="asmActionSummary" class="text-primary">+1 Quạt 3 lá</strong>
+    </div>
+
+    <button class="btn btn-green btn-block" onclick="confirmAssemble()">Xác nhận</button>
+  </div>
+</div>
+
+<!-- MODAL LINH KIỆN -->
+<div id="partModal" class="modal-backdrop">
+  <div class="modal-sheet">
+    <div class="modal-header">
+      <div class="modal-title" id="partModalTitle">Linh kiện</div>
+      <button class="close-btn" onclick="closeModal('partModal')">✕</button>
+    </div>
+    <input type="hidden" id="ptId" />
+
+    <div class="field">
+      <label>Tên linh kiện *</label>
+      <input type="text" id="ptName" />
+    </div>
+    <div class="row">
+      <div class="field" style="flex:1;">
+        <label>Đơn vị</label>
+        <input type="text" id="ptUnit" value="Cái" />
+      </div>
+      <div class="field" style="flex:1;">
+        <label>Giá nhập</label>
+        <input type="number" inputmode="numeric" id="ptPrice" />
+      </div>
+    </div>
+    <div class="row">
+      <div class="field" style="flex:1;">
+        <label>Tồn kho</label>
+        <input type="number" inputmode="numeric" id="ptQty" value="0" />
+      </div>
+      <div class="field" style="flex:1;">
+        <label>Cảnh báo khi ≤</label>
+        <input type="number" inputmode="numeric" id="ptMinQty" value="5" />
+      </div>
+    </div>
+    <div class="field">
+      <label>Ghi chú</label>
+      <input type="text" id="ptNote" />
+    </div>
+    <div class="row">
+      <button class="btn btn-danger" id="ptDeleteBtn" style="display:none;" onclick="deleteCurrentPart()">Xóa</button>
+      <button class="btn btn-primary" style="flex:1;" onclick="savePart()">Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NHẬP THÊM -->
+<div id="importPartModal" class="modal-backdrop">
+  <div class="modal-sheet">
+    <div class="modal-header">
+      <div class="modal-title" id="impTitle">Nhập thêm</div>
+      <button class="close-btn" onclick="closeModal('importPartModal')">✕</button>
+    </div>
+    <input type="hidden" id="impId" />
+    <div class="field">
+      <label>Số lượng mua thêm (+)</label>
+      <input type="number" inputmode="numeric" id="impAddQty" value="10" />
+    </div>
+    <div class="field">
+      <label>Giá nhập mới</label>
+      <input type="number" inputmode="numeric" id="impNewPrice" />
+    </div>
+    <button class="btn btn-green btn-block" onclick="confirmImportPart()">Xác nhận</button>
+  </div>
+</div>
+
+<script>
+  const LS_KEY = "so_quat_v1";
+  const FAN_TYPES = ["Quạt vàng", "Quạt 3 lá", "Quạt 6 lá"];
+
+  const FAN_RECIPES = {
+    "Quạt vàng": ["p_motor6w", "p_latvat"],
+    "Quạt 3 lá": ["p_motor", "p_long", "p_canh3", "p_kep", "p_tau", "p_than", "p_latvat"],
+    "Quạt 6 lá": ["p_motor", "p_long", "p_canh6", "p_kep", "p_tau", "p_than", "p_latvat"]
+  };
+
+  function getDefaultParts() {
+    return [
+      { id: "p_motor",   name: "Motor (quạt chế)",             unit: "Cái", price: 85000,  qty: 0, minQty: 5, note: "" },
+      { id: "p_motor6w", name: "Motor 6W (quạt vàng)",         unit: "Cái", price: 115000, qty: 0, minQty: 5, note: "" },
+      { id: "p_long",    name: "Lồng",                         unit: "Cái", price: 28000,  qty: 0, minQty: 5, note: "" },
+      { id: "p_canh6",   name: "Cánh 6 lá",                    unit: "Cái", price: 32000,  qty: 0, minQty: 5, note: "" },
+      { id: "p_canh3",   name: "Cánh 3 lá",                    unit: "Cái", price: 17000,  qty: 0, minQty: 5, note: "" },
+      { id: "p_kep",     name: "Chân kẹp",                     unit: "Cái", price: 32000,  qty: 0, minQty: 5, note: "" },
+      { id: "p_tau",     name: "Tẩu 3m",                       unit: "Bộ",  price: 27000,  qty: 0, minQty: 5, note: "" },
+      { id: "p_than",    name: "Thân",                         unit: "Cái", price: 9000,   qty: 0, minQty: 5, note: "" },
+      { id: "p_latvat",  name: "Lặt vặt (ốc vít, ống gen...)", unit: "Bộ",  price: 20000,  qty: 0, minQty: 5, note: "" }
+    ];
+  }
+
+  let state = {
+    orders: [],
+    parts: getDefaultParts(),
+    readyStock: { "Quạt vàng": 0, "Quạt 3 lá": 0, "Quạt 6 lá": 0 },
+    lastBackupAt: "",
+    settings: {
+      "Quạt vàng": { price: 430000, cost: 200000 },
+      "Quạt 3 lá": { price: 400000, cost: 200000 },
+      "Quạt 6 lá": { price: 430000, cost: 200000 }
+    }
+  };
+
+  let formWh = "GW0";
+  let formProd = "Quạt vàng";
+  let formStatus = "Chờ mùng 10";
+  let suggestList = [];
+  let calcSelected = {};
+  let asmProd = "Quạt 3 lá";
+  let asmChecked = {};
+
+  function init() {
+    const raw = localStorage.getItem(LS_KEY);
+    if (raw) {
+      try { state = JSON.parse(raw); } catch (e) {}
+    } else {
+      saveLocal();
+    }
+    loadSettingsInputs();
+    updateLastBackupLabel();
+    populateMonthFilter();
+    renderSales();
+    renderParts();
+  }
+
+  function saveLocal() { localStorage.setItem(LS_KEY, JSON.stringify(state)); }
+
+  function getTodayStr() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+
+  function fmtMoney(n) { return (Number(n) || 0).toLocaleString("vi-VN") + "đ"; }
+
+  function esc(str) {
+    return String(str || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
+
+  function showToast(msg) {
+    const el = document.getElementById("toast");
+    el.textContent = msg;
+    el.style.display = "block";
+    clearTimeout(window._toastTimer);
+    window._toastTimer = setTimeout(() => { el.style.display = "none"; }, 2300);
+  }
+
+  function switchTab(name) {
+    document.querySelectorAll(".tab-page").forEach(p => p.classList.remove("active"));
+    document.getElementById("tab-" + name).classList.add("active");
+    document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+    document.getElementById("nav-" + name).classList.add("active");
+  }
+
+  function openModal(id) { document.getElementById(id).classList.add("open"); }
+  function closeModal(id) { document.getElementById(id).classList.remove("open"); }
+
+  function getFanUnitCost(fanType) {
+    const recipe = FAN_RECIPES[fanType] || [];
+    return recipe.reduce((sum, partId) => {
+      const part = state.parts.find(p => p.id === partId);
+      return sum + (part ? (Number(part.price) || 0) : 0);
+    }, 0);
+  }
+
+  // ===== TAB 1: BÁN HÀNG =====
+  function populateMonthFilter() {
+    const sel = document.getElementById("filterMonth");
+    const curVal = sel.value || "ALL";
+    const months = new Set([getTodayStr().slice(0, 7)]);
+    state.orders.forEach(o => { if (o.date) months.add(o.date.slice(0, 7)); });
+    const sorted = Array.from(months).sort().reverse();
+    sel.innerHTML = `<option value="ALL">Mọi tháng</option>` +
+      sorted.map(m => `<option value="${m}">T${m.slice(5,7)}/${m.slice(2,4)}</option>`).join("");
+    sel.value = sorted.includes(curVal) || curVal === "ALL" ? curVal : "ALL";
+  }
+
+  function quickFilterWait() {
+    const sel = document.getElementById("filterStatus");
+    sel.value = sel.value === "Chờ mùng 10" ? "ALL" : "Chờ mùng 10";
+    renderSales();
+  }
+
+  function renderSales() {
+    const r = state.readyStock;
+    document.getElementById("salesReadyBanner").textContent =
+      `Vàng ${r["Quạt vàng"] || 0} • 3 lá ${r["Quạt 3 lá"] || 0} • 6 lá ${r["Quạt 6 lá"] || 0}`;
+
+    const q = document.getElementById("filterSearch").value.trim().toLowerCase();
+    const m = document.getElementById("filterMonth").value;
+    const wh = document.getElementById("filterWarehouse").value;
+    const st = document.getElementById("filterStatus").value;
+
+    const filtered = state.orders
+      .filter(o => {
+        if (m !== "ALL" && !o.date.startsWith(m)) return false;
+        if (wh !== "ALL" && o.warehouse !== wh) return false;
+        if (st !== "ALL" && o.status !== st) return false;
+        if (q && !`${o.customerName} ${o.phone} ${o.note} ${o.productType}`.toLowerCase().includes(q)) return false;
+        return true;
+      })
+      .sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
+
+    let rev = 0, profit = 0, qVang = 0, q3 = 0, q6 = 0;
+    filtered.forEach(o => {
+      rev += o.qty * o.unitPrice;
+      profit += o.qty * (o.unitPrice - o.unitCost);
+      if (o.productType === "Quạt vàng") qVang += o.qty;
+      else if (o.productType === "Quạt 3 lá") q3 += o.qty;
+      else if (o.productType === "Quạt 6 lá") q6 += o.qty;
+    });
+
+    let waitMoney = 0, waitCount = 0;
+    state.orders.forEach(o => {
+      if (m !== "ALL" && !o.date.startsWith(m)) return;
+      if (wh !== "ALL" && o.warehouse !== wh) return;
+      if (o.status === "Chờ mùng 10") {
+        waitMoney += o.qty * o.unitPrice;
+        waitCount++;
+      }
+    });
+
+    document.getElementById("stRevenue").textContent = fmtMoney(rev);
+    document.getElementById("stOrdersCount").textContent = `${filtered.length} đơn`;
+    document.getElementById("stProfit").textContent = fmtMoney(profit);
+    document.getElementById("stProdCounts").textContent = `Vàng ${qVang} • 3 lá ${q3} • 6 lá ${q6}`;
+    document.getElementById("stPendingMoney").textContent = fmtMoney(waitMoney);
+    document.getElementById("stPendingCount").textContent = `${waitCount} đơn`;
+
+    const listEl = document.getElementById("salesList");
+    if (!filtered.length) {
+      listEl.innerHTML = `<div class="empty">Chưa có đơn hàng nào.</div>`;
+      return;
+    }
+
+    listEl.innerHTML = filtered.map(o => {
+      const total = o.qty * o.unitPrice;
+      const prof = o.qty * (o.unitPrice - o.unitCost);
+      const isWait = o.status === "Chờ mùng 10";
+      const dateDisp = o.date ? `${o.date.slice(8,10)}/${o.date.slice(5,7)}` : "";
+
+      return `
+        <div class="order-card">
+          <div class="between" style="align-items:flex-start;">
+            <div>
+              <strong style="font-size:15px;">${esc(o.customerName)}</strong>
+              <span class="badge" style="margin-left:4px;">${esc(o.warehouse)}</span>
+              <div style="font-size:12px; color:var(--muted); margin-top:2px;">
+                ${dateDisp}${o.phone ? ` • <a href="tel:${esc(o.phone)}" style="color:inherit;">${esc(o.phone)}</a>` : ""}
+              </div>
+            </div>
+            <div style="text-align:right;">
+              <strong class="text-primary" style="font-size:15px;">${fmtMoney(total)}</strong>
+              <div style="margin-top:2px;">
+                <span class="badge ${isWait ? 'badge-wait' : 'badge-done'}">${isWait ? 'Mùng 10' : 'Đã xong'}</span>
+              </div>
+            </div>
+          </div>
+          <div class="between" style="margin-top:7px; font-size:13px;">
+            <span>${esc(o.productType)} × ${o.qty}${o.note ? ` <span class="text-muted">(${esc(o.note)})</span>` : ""}</span>
+            <span class="text-green">Lãi ${fmtMoney(prof)}</span>
+          </div>
+          <div class="row" style="margin-top:8px; gap:6px;">
+            ${isWait ? `<button class="btn btn-sm btn-green" onclick="markOrderDone('${o.id}')">Đã thu</button>` : ""}
+            <button class="btn btn-sm btn-soft" onclick="openOrderModal('${o.id}')">Sửa</button>
+            <button class="btn btn-sm btn-soft" onclick="buyAgainFor('${o.id}')">+ Mua thêm</button>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function selectWh(wh, btn) {
+    formWh = wh;
+    document.querySelectorAll("#ordWhChips .chip").forEach(c => c.classList.remove("active"));
+    btn.classList.add("active");
+  }
+
+  function selectProduct(prodName, btn) {
+    formProd = prodName;
+    document.querySelectorAll("#ordProdChips .chip").forEach(c => c.classList.remove("active"));
+    btn.classList.add("active");
+    const def = state.settings[prodName];
+    document.getElementById("ordPrice").value = def.price;
+    document.getElementById("ordCost").value = def.cost;
+    updateOrderPreview();
+  }
+
+  function selectStatus(st, btn) {
+    formStatus = st;
+    document.querySelectorAll("#ordStatusChips .chip").forEach(c => c.classList.remove("active-green", "active-amber"));
+    btn.classList.add(st === "Đã xong" ? "active-green" : "active-amber");
+  }
+
+  function updateOrderPreview() {
+    const qty = Number(document.getElementById("ordQty").value) || 0;
+    const price = Number(document.getElementById("ordPrice").value) || 0;
+    const cost = Number(document.getElementById("ordCost").value) || 0;
+    document.getElementById("ordPreviewTotal").textContent = fmtMoney(qty * price);
+    document.getElementById("ordPreviewProfit").textContent = fmtMoney(qty * (price - cost));
+  }
+
+  function renderCustomerSuggestions() {
+    const kw = document.getElementById("ordName").value.trim().toLowerCase();
+    const box = document.getElementById("customerSuggest");
+    if (!kw) { box.innerHTML = ""; return; }
+    const seen = new Map();
+    state.orders.forEach(o => {
+      if (o.customerName.toLowerCase().includes(kw)) {
+        const key = `${o.customerName}|${o.warehouse}`;
+        if (!seen.has(key)) seen.set(key, o);
+      }
+    });
+    suggestList = Array.from(seen.values()).slice(0, 5);
+    box.innerHTML = suggestList.map((o, i) =>
+      `<button type="button" class="suggest-chip" onclick="pickCustomer(${i})">
+        ${esc(o.customerName)} (${esc(o.warehouse)})
+      </button>`
+    ).join("");
+  }
+
+  function pickCustomer(idx) {
+    const o = suggestList[idx];
+    if (!o) return;
+    document.getElementById("ordName").value = o.customerName;
+    document.getElementById("ordPhone").value = o.phone || "";
+    document.getElementById("customerSuggest").innerHTML = "";
+    formWh = o.warehouse;
+    document.querySelectorAll("#ordWhChips .chip").forEach(b => b.classList.toggle("active", b.textContent.trim() === o.warehouse));
+  }
+
+  function openOrderModal(editId = null, prefill = null) {
+    document.getElementById("customerSuggest").innerHTML = "";
+    const delBtn = document.getElementById("ordDeleteBtn");
+    const deductCb = document.getElementById("ordDeductStock");
+
+    if (editId) {
+      const o = state.orders.find(x => x.id === editId);
+      if (!o) return;
+      document.getElementById("orderModalTitle").textContent = "Sửa đơn";
+      document.getElementById("ordId").value = o.id;
+      document.getElementById("ordDate").value = o.date;
+      document.getElementById("ordName").value = o.customerName;
+      document.getElementById("ordPhone").value = o.phone || "";
+      document.getElementById("ordQty").value = o.qty;
+      document.getElementById("ordPrice").value = o.unitPrice;
+      document.getElementById("ordCost").value = o.unitCost;
+      document.getElementById("ordNote").value = o.note || "";
+      deductCb.checked = o.deductedQty > 0;
+
+      formWh = o.warehouse;
+      document.querySelectorAll("#ordWhChips .chip").forEach(b => b.classList.toggle("active", b.textContent.trim() === formWh));
+
+      formProd = o.productType;
+      document.querySelectorAll("#ordProdChips .chip").forEach(b => b.classList.toggle("active", b.textContent.trim() === formProd));
+
+      formStatus = o.status;
+      const stBtns = document.querySelectorAll("#ordStatusChips .chip");
+      stBtns[0].className = "chip" + (formStatus === "Chờ mùng 10" ? " active-amber" : "");
+      stBtns[1].className = "chip" + (formStatus === "Đã xong" ? " active-green" : "");
+      delBtn.style.display = "inline-flex";
+    } else {
+      document.getElementById("orderModalTitle").textContent = "Thêm đơn";
+      document.getElementById("ordId").value = "";
+      document.getElementById("ordDate").value = getTodayStr();
+      document.getElementById("ordName").value = prefill ? prefill.customerName : "";
+      document.getElementById("ordPhone").value = prefill ? (prefill.phone || "") : "";
+      document.getElementById("ordQty").value = 1;
+      document.getElementById("ordNote").value = "";
+      deductCb.checked = true;
+
+      formWh = prefill ? prefill.warehouse : "GW0";
+      document.querySelectorAll("#ordWhChips .chip").forEach(b => b.classList.toggle("active", b.textContent.trim() === formWh));
+
+      selectProduct("Quạt vàng", document.querySelector("#ordProdChips .chip"));
+      selectStatus("Chờ mùng 10", document.querySelector("#ordStatusChips .chip"));
+      delBtn.style.display = "none";
+    }
+    updateOrderPreview();
+    openModal("orderModal");
+  }
+
+  function buyAgainFor(id) {
+    const o = state.orders.find(x => x.id === id);
+    if (o) openOrderModal(null, o);
+  }
+
+  function saveOrder() {
+    const name = document.getElementById("ordName").value.trim();
+    if (!name) { showToast("Chưa nhập tên khách"); return; }
+
+    const existingId = document.getElementById("ordId").value;
+    if (existingId) {
+      const old = state.orders.find(x => x.id === existingId);
+      if (old && old.deductedQty > 0) {
+        state.readyStock[old.productType] += old.deductedQty;
+      }
+    }
+
+    const qty = Math.max(1, Number(document.getElementById("ordQty").value) || 1);
+    let deductedQty = 0;
+    if (document.getElementById("ordDeductStock").checked) {
+      const avail = state.readyStock[formProd] || 0;
+      deductedQty = Math.min(avail, qty);
+      state.readyStock[formProd] = avail - deductedQty;
+    }
+
+    const item = {
+      id: existingId || ("ORD_" + Date.now()),
+      date: document.getElementById("ordDate").value || getTodayStr(),
+      customerName: name,
+      phone: document.getElementById("ordPhone").value.trim(),
+      warehouse: formWh,
+      productType: formProd,
+      qty,
+      unitPrice: Number(document.getElementById("ordPrice").value) || 0,
+      unitCost: Number(document.getElementById("ordCost").value) || 0,
+      status: formStatus,
+      note: document.getElementById("ordNote").value.trim(),
+      deductedQty
+    };
+
+    if (existingId) {
+      const idx = state.orders.findIndex(x => x.id === existingId);
+      state.orders[idx] = item;
+    } else {
+      state.orders.unshift(item);
+    }
+
+    saveLocal();
+    populateMonthFilter();
+    renderSales();
+    renderParts();
+    closeModal("orderModal");
+    showToast("Đã lưu đơn");
+  }
+
+  function markOrderDone(id) {
+    const o = state.orders.find(x => x.id === id);
+    if (!o) return;
+    o.status = "Đã xong";
+    saveLocal();
+    renderSales();
+    showToast("Đã thu tiền");
+  }
+
+  function deleteCurrentOrder() {
+    const id = document.getElementById("ordId").value;
+    if (!id || !confirm("Xóa đơn này?")) return;
+    const old = state.orders.find(x => x.id === id);
+    if (old && old.deductedQty > 0) {
+      state.readyStock[old.productType] += old.deductedQty;
+    }
+    state.orders = state.orders.filter(x => x.id !== id);
+    saveLocal();
+    populateMonthFilter();
+    renderSales();
+    renderParts();
+    closeModal("orderModal");
+    showToast("Đã xóa đơn");
+  }
+
+  // ===== TAB 2: KHO =====
+  function adjustReadyStock(fanType, delta) {
+    state.readyStock[fanType] = Math.max(0, (state.readyStock[fanType] || 0) + delta);
+    saveLocal();
+    renderParts();
+    renderSales();
+  }
+
+  function openAssembleModal() {
+    document.getElementById("asmQty").value = 1;
+    document.getElementById("asmDeductParts").checked = true;
+    document.getElementById("asmPartsWrapper").style.display = "block";
+    selectAsmProduct("Quạt 3 lá", document.querySelector("#asmProdChips .chip"));
+    openModal("assembleModal");
+  }
+
+  function selectAsmProduct(prod, btn) {
+    asmProd = prod;
+    document.querySelectorAll("#asmProdChips .chip").forEach(c => c.classList.remove("active"));
+    btn.classList.add("active");
+
+    const recipe = FAN_RECIPES[prod] || [];
+    asmChecked = {};
+    state.parts.forEach(p => { asmChecked[p.id] = recipe.includes(p.id); });
+
+    document.getElementById("asmPartsList").innerHTML = state.parts.map(p => `
+      <div class="calc-row">
+        <label class="row" style="margin:0; flex:1; font-weight:500;">
+          <input type="checkbox" ${asmChecked[p.id] ? "checked" : ""} onchange="asmChecked['${p.id}']=this.checked; updateAsmSummary();" />
+          <span>${esc(p.name)} <small class="text-muted">(${fmtMoney(p.price)} • còn ${p.qty})</small></span>
+        </label>
+      </div>
+    `).join("");
+    updateAsmSummary();
+  }
+
+  function toggleAsmPartsList() {
+    document.getElementById("asmPartsWrapper").style.display =
+      document.getElementById("asmDeductParts").checked ? "block" : "none";
+  }
+
+  function updateAsmSummary() {
+    const qty = Math.max(1, Number(document.getElementById("asmQty").value) || 1);
+    const unitCost = state.parts.reduce((s, p) => s + (asmChecked[p.id] ? p.price : 0), 0);
+    document.getElementById("asmUnitCost").textContent = fmtMoney(unitCost);
+    document.getElementById("asmActionSummary").textContent = `+${qty} ${asmProd}`;
+  }
+
+  function confirmAssemble() {
+    const qty = Math.max(1, Number(document.getElementById("asmQty").value) || 1);
+    state.readyStock[asmProd] = (state.readyStock[asmProd] || 0) + qty;
+    if (document.getElementById("asmDeductParts").checked) {
+      state.parts.forEach(p => {
+        if (asmChecked[p.id]) p.qty = Math.max(0, p.qty - qty);
+      });
+    }
+    saveLocal();
+    renderParts();
+    renderSales();
+    closeModal("assembleModal");
+    showToast(`Đã thêm +${qty} ${asmProd}`);
+  }
+
+  function renderParts() {
+    let readyVal = 0;
+    document.getElementById("readyStockRows").innerHTML = FAN_TYPES.map(ft => {
+      const cnt = state.readyStock[ft] || 0;
+      const unitCost = getFanUnitCost(ft);
+      readyVal += cnt * unitCost;
+      return `
+        <div class="list-row">
+          <div>
+            <strong style="font-size:15px;">${ft}</strong>
+            <div style="font-size:12px; color:var(--muted);">Vốn: ${fmtMoney(unitCost)}/cây</div>
+          </div>
+          <div class="qty-ctrl">
+            <button class="btn btn-sm btn-soft" onclick="adjustReadyStock('${ft}', -1)">-</button>
+            <span class="qty-num ${cnt > 0 ? 'text-primary' : 'text-muted'}">${cnt}</span>
+            <button class="btn btn-sm btn-soft" onclick="adjustReadyStock('${ft}', 1)">+</button>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    const partsVal = state.parts.reduce((s, p) => s + p.price * p.qty, 0);
+    const totalCapital = readyVal + partsVal;
+
+    document.getElementById("totalStockCapital").textContent = fmtMoney(totalCapital);
+    document.getElementById("stockCapitalBreakdown").textContent =
+      `Quạt sẵn: ${fmtMoney(readyVal)} • Linh kiện: ${fmtMoney(partsVal)}`;
+    document.getElementById("ptSummary").textContent = `${state.parts.length} món • Vốn tồn: ${fmtMoney(partsVal)}`;
+
+    const q = document.getElementById("partSearch").value.trim().toLowerCase();
+    const list = state.parts.filter(p => !q || p.name.toLowerCase().includes(q));
+
+    const el = document.getElementById("partsList");
+    if (!list.length) {
+      el.innerHTML = `<div class="empty">Không tìm thấy linh kiện.</div>`;
+    } else {
+      el.innerHTML = list.map(p => {
+        const qtyCls = p.qty > 0 && p.qty <= p.minQty ? "text-amber" : (p.qty === 0 ? "text-muted" : "");
+        return `
+          <div class="list-row">
+            <div style="flex:1; cursor:pointer;" onclick="openPartModal('${p.id}')">
+              <div style="font-weight:600; font-size:14px;">${esc(p.name)} <span style="font-size:12px;">✏️</span></div>
+              <div style="font-size:12px; color:var(--muted);">
+                ${fmtMoney(p.price)}/${esc(p.unit)}${p.note ? ` • ${esc(p.note)}` : ""}
+              </div>
+            </div>
+            <div class="qty-ctrl">
+              <button class="btn btn-sm btn-soft" onclick="adjustPartQty('${p.id}', -1)">-</button>
+              <span class="qty-num ${qtyCls}">${p.qty}</span>
+              <button class="btn btn-sm btn-soft" onclick="adjustPartQty('${p.id}', 1)">+</button>
+              <button class="btn btn-sm btn-green" onclick="openImportPartModal('${p.id}')">Nhập</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+    renderCalcList();
+  }
+
+  function openPartModal(editId = null) {
+    const delBtn = document.getElementById("ptDeleteBtn");
+    if (editId) {
+      const p = state.parts.find(x => x.id === editId);
+      if (!p) return;
+      document.getElementById("partModalTitle").textContent = "Sửa linh kiện";
+      document.getElementById("ptId").value = p.id;
+      document.getElementById("ptName").value = p.name;
+      document.getElementById("ptUnit").value = p.unit;
+      document.getElementById("ptPrice").value = p.price;
+      document.getElementById("ptQty").value = p.qty;
+      document.getElementById("ptMinQty").value = p.minQty;
+      document.getElementById("ptNote").value = p.note || "";
+      delBtn.style.display = "inline-flex";
+    } else {
+      document.getElementById("partModalTitle").textContent = "Thêm linh kiện";
+      document.getElementById("ptId").value = "";
+      document.getElementById("ptName").value = "";
+      document.getElementById("ptUnit").value = "Cái";
+      document.getElementById("ptPrice").value = "";
+      document.getElementById("ptQty").value = 0;
+      document.getElementById("ptMinQty").value = 5;
+      document.getElementById("ptNote").value = "";
+      delBtn.style.display = "none";
+    }
+    openModal("partModal");
+  }
+
+  function savePart() {
+    const name = document.getElementById("ptName").value.trim();
+    if (!name) { showToast("Chưa nhập tên"); return; }
+    const existingId = document.getElementById("ptId").value;
+    const item = {
+      id: existingId || ("p_" + Date.now()),
+      name,
+      unit: document.getElementById("ptUnit").value.trim() || "Cái",
+      price: Number(document.getElementById("ptPrice").value) || 0,
+      qty: Math.max(0, Number(document.getElementById("ptQty").value) || 0),
+      minQty: Math.max(0, Number(document.getElementById("ptMinQty").value) || 0),
+      note: document.getElementById("ptNote").value.trim()
+    };
+    if (existingId) {
+      const idx = state.parts.findIndex(x => x.id === existingId);
+      state.parts[idx] = item;
+    } else {
+      state.parts.push(item);
+    }
+    saveLocal();
+    renderParts();
+    closeModal("partModal");
+    showToast("Đã lưu");
+  }
+
+  function adjustPartQty(id, delta) {
+    const p = state.parts.find(x => x.id === id);
+    if (!p) return;
+    p.qty = Math.max(0, p.qty + delta);
+    saveLocal();
+    renderParts();
+  }
+
+  function openImportPartModal(id) {
+    const p = state.parts.find(x => x.id === id);
+    if (!p) return;
+    document.getElementById("impId").value = p.id;
+    document.getElementById("impTitle").textContent = "Nhập: " + p.name;
+    document.getElementById("impAddQty").value = 10;
+    document.getElementById("impNewPrice").value = p.price;
+    openModal("importPartModal");
+  }
+
+  function confirmImportPart() {
+    const p = state.parts.find(x => x.id === document.getElementById("impId").value);
+    if (!p) return;
+    const addQty = Number(document.getElementById("impAddQty").value) || 0;
+    p.qty = Math.max(0, p.qty + addQty);
+    p.price = Number(document.getElementById("impNewPrice").value) || 0;
+    saveLocal();
+    renderParts();
+    closeModal("importPartModal");
+    showToast(`Đã nhập +${addQty}`);
+  }
+
+  function deleteCurrentPart() {
+    const id = document.getElementById("ptId").value;
+    if (!id || !confirm("Xóa linh kiện này?")) return;
+    state.parts = state.parts.filter(x => x.id !== id);
+    saveLocal();
+    renderParts();
+    closeModal("partModal");
+    showToast("Đã xóa");
+  }
+
+  function toggleCalcBox() {
+    const box = document.getElementById("calcBox");
+    box.style.display = box.style.display === "none" ? "block" : "none";
+    if (box.style.display === "block" && !Object.keys(calcSelected).length) {
+      applyCalcPreset("Quạt 3 lá");
+    } else {
+      renderCalcList();
+    }
+  }
+
+  function applyCalcPreset(fanType) {
+    const recipe = FAN_RECIPES[fanType] || [];
+    calcSelected = {};
+    state.parts.forEach(p => { calcSelected[p.id] = { checked: recipe.includes(p.id), qty: 1 }; });
+    renderCalcList();
+  }
+
+  function renderCalcList() {
+    if (document.getElementById("calcBox").style.display === "none") return;
+    let sum = 0;
+    document.getElementById("calcList").innerHTML = state.parts.map(p => {
+      const sel = calcSelected[p.id] || { checked: false, qty: 1 };
+      if (sel.checked) sum += p.price * sel.qty;
+      return `
+        <div class="calc-row">
+          <label class="row" style="margin:0; flex:1; font-weight:500;">
+            <input type="checkbox" ${sel.checked ? "checked" : ""} onchange="calcSelected['${p.id}']={checked:this.checked, qty:${sel.qty}}; renderCalcList();" />
+            <span>${esc(p.name)} <small class="text-muted">(${fmtMoney(p.price)})</small></span>
+          </label>
+          <input type="number" step="0.1" class="calc-qty" value="${sel.qty}" oninput="calcSelected['${p.id}']={checked:true, qty:Number(this.value)||0}; updateCalcSum();" />
+        </div>
+      `;
+    }).join("");
+    document.getElementById("calcTotal").textContent = fmtMoney(sum);
+  }
+
+  function updateCalcSum() {
+    const sum = state.parts.reduce((s, p) => {
+      const sel = calcSelected[p.id];
+      return s + (sel && sel.checked ? p.price * sel.qty : 0);
+    }, 0);
+    document.getElementById("calcTotal").textContent = fmtMoney(sum);
+  }
+
+  // ===== TAB 3: CÀI ĐẶT =====
+  function loadSettingsInputs() {
+    const s = state.settings;
+    document.getElementById("defPriceVang").value = s["Quạt vàng"].price;
+    document.getElementById("defCostVang").value  = s["Quạt vàng"].cost;
+    document.getElementById("defPrice3La").value  = s["Quạt 3 lá"].price;
+    document.getElementById("defCost3La").value   = s["Quạt 3 lá"].cost;
+    document.getElementById("defPrice6La").value  = s["Quạt 6 lá"].price;
+    document.getElementById("defCost6La").value   = s["Quạt 6 lá"].cost;
+  }
+
+  function savePriceSettings() {
+    state.settings = {
+      "Quạt vàng": { price: Number(document.getElementById("defPriceVang").value) || 0, cost: Number(document.getElementById("defCostVang").value) || 0 },
+      "Quạt 3 lá": { price: Number(document.getElementById("defPrice3La").value) || 0,  cost: Number(document.getElementById("defCost3La").value) || 0 },
+      "Quạt 6 lá": { price: Number(document.getElementById("defPrice6La").value) || 0,  cost: Number(document.getElementById("defCost6La").value) || 0 }
+    };
+    saveLocal();
+    showToast("Đã lưu giá mặc định");
+  }
+
+  function resetDefaultParts() {
+    if (!confirm("Nạp lại 9 linh kiện mẫu ban đầu?")) return;
+    state.parts = getDefaultParts();
+    saveLocal();
+    renderParts();
+    showToast("Đã nạp lại");
+  }
+
+  function updateLastBackupLabel() {
+    document.getElementById("lastBackupText").textContent = state.lastBackupAt
+      ? `Sao lưu gần nhất: ${state.lastBackupAt}`
+      : "Dữ liệu lưu trên máy này. Nên sao lưu định kỳ.";
+  }
+
+  function exportBackup() {
+    const now = new Date();
+    state.lastBackupAt = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')} - ${String(now.getDate()).padStart(2,'0')}/${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()}`;
+    saveLocal();
+    updateLastBackupLabel();
+
+    const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `so-quat-${getTodayStr()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 300);
+    showToast("Đang tải file sao lưu...");
+  }
+
+  function importBackup(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      try {
+        const d = JSON.parse(ev.target.result);
+        if (!confirm(`Khôi phục ${(d.orders || []).length} đơn và ${(d.parts || []).length} linh kiện?`)) {
+          e.target.value = "";
+          return;
+        }
+        state = d;
+        saveLocal();
+        loadSettingsInputs();
+        updateLastBackupLabel();
+        populateMonthFilter();
+        renderSales();
+        renderParts();
+        showToast("Khôi phục xong!");
+      } catch (err) {
+        showToast("File không hợp lệ");
+      }
+      e.target.value = "";
+    };
+    reader.readAsText(file);
+  }
+
+  init();
+</script>
+</body>
+</html>
